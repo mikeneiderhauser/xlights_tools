@@ -1,4 +1,6 @@
-Note had to rename 
+Note had to rename the following submodels
+  - Inner Star from Inner Star 1
+  - Middle Star from Middle star 1
 
 Ice_Princess_47in_Chromaflake-WirePath_STOCK.xmodel -> reworked model from Clyde L
 Ice_Princess_47in_Chromaflake-WirePath.xmodel -> model the script generated
