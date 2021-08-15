@@ -72,6 +72,37 @@ def find_max_pixel(model):
     return max_pixel_num
 
 
+def reverse_custom_model(model):
+    global ids
+    lines = model.split(';')
+    new_model_str = ""
+    for l in lines:
+        line_ids = l.split(',')
+        for i in line_ids:
+            new_model_str = new_model_str + ","
+            if len(i) > 0:
+                id = int(i)
+                new_model_str = new_model_str + str(ids[id]) + ","
+        new_model_str = new_model_str + ";"
+
+    # strip last ';'
+    new_model_str = new_model_str[:-1]
+    return new_model_str
+
+
+def replace_line_endings(file_path):
+    WINDOWS_LINE_ENDING = b'\r\n'
+    UNIX_LINE_ENDING = b'\n'
+
+    with open(file_path, 'rb') as open_file:
+        content = open_file.read()
+        
+    content = content.replace(WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
+
+    with open(file_path, 'wb') as open_file:
+        open_file.write(content)
+
+
 def main(args):
     # create xml tree of xml file
     tree = ET.parse(args.model_xml_file)
@@ -84,6 +115,9 @@ def main(args):
     global ids
     ids = list(range(pixel_ct,0,-1))
     ids.insert(0,99999999)  # xligts is 1 indexed not 0 index. throw trash out front
+
+    reversed_custom_model = reverse_custom_model(root.attrib['CustomModel'])
+    root.attrib['CustomModel'] = reversed_custom_model
 
     submodels = {}
     non_submodels = []
@@ -151,13 +185,11 @@ def main(args):
         root.append(element)
 
     print("Writing to XML file %s" % (args.model_xml_file_out))
-    tree.write(args.model_xml_file_out, encoding='utf-8', xml_declaration=True)
+    tree.write(args.model_xml_file_out, encoding="UTF-8", xml_declaration=True)
+    replace_line_endings(args.model_xml_file_out)
 
 
 if __name__=="__main__":
-    # TODO Reverse custommodel['CustomModel']
-    # TODO Calculate node count from custommodel['CustomModel']
-
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--input', dest='model_xml_file', help='xmodel file to process')
     parser.add_argument('--output', dest='model_xml_file_out', help='xmodel file to write')
